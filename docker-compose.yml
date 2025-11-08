@@ -1,0 +1,119 @@
+
+services:
+  # ========== ACCOUNT SERVICE ==========
+  account-db:
+    image: postgres:16
+    container_name: account-db
+    environment:
+      POSTGRES_DB: MSS301Summer25DBAccount
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5433:5432"
+    restart: always
+    networks:
+      - microservices-network
+
+  account-service:
+    build: ./MSAccount_SE184931
+    container_name: account-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://account-db:5432/MSS301Summer25DBAccount
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+    ports:
+      - "8081:8081"
+    depends_on:
+      - account-db
+    restart: always
+    networks:
+      - microservices-network
+
+  # ========== BRAND SERVICE ==========
+  brand-db:
+    image: postgres:16
+    container_name: brand-db
+    environment:
+      POSTGRES_DB: MSS301Summer25DBBrand
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - microservices-network
+
+  brand-service:
+    build: ./MSBrand_SE184931
+    container_name: brand-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://brand-db:5432/MSS301Summer25DBBrand
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+    ports:
+      - "8083:8083"
+    depends_on:
+      - brand-db
+    restart: always
+    networks:
+      - microservices-network
+
+  # ========== BLINDBOX SERVICE ==========
+  blindbox-db:
+    image: postgres:16
+    container_name: blindbox-db
+    environment:
+      POSTGRES_DB: MSS301Summer25DBBlindBox
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5434:5432"
+    restart: always
+    networks:
+      - microservices-network
+
+  blindbox-service:
+    build: ./MSBlindBox_SE184931
+    container_name: blindbox-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://blindbox-db:5432/MSS301Summer25DBBlindBox
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+    ports:
+      - "8082:8082"
+    depends_on:
+      - blindbox-db
+    restart: always
+    networks:
+      - microservices-network
+
+  # ========== API GATEWAY ==========
+  gateway:
+    build: ./APIGateway_SE184931
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - account-service
+      - brand-service
+      - blindbox-service
+    restart: always
+    networks:
+      - microservices-network
+
+  # ========== Front-end ==========
+  frontend:
+    build: ./MSFE_SE184931
+    container_name: MSFE_SE184931
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - brand-service
+    environment:
+      VITE_API_BASE: http://gateway:8080
+
+networks:
+  microservices-network:
+    driver: bridge
+

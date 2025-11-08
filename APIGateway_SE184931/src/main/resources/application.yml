@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: APIGateway_SE184931
+  profiles:
+    active: docker
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+
+server:
+  port: 8080
+
+jwt:
+  secret-key: aklsdfjhlaisdhfviuahpgvuoiahfdouivhapiughauoih
+
